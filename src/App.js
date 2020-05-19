@@ -18,19 +18,18 @@ class App extends React.Component{
     }
 
     // this.timeChange = this.timeChange.bind(this);
-      
+    
   }
 
   titleChange = e => {
     this.setState({
         title: e.target.value,
     });
-    console.log("title = "+this.state.title);
+    
   }
   
 
   contentChange = e => {
-    console.log("content = "+this.state.content);
     this.setState({
         content: e.target.value,
     });
@@ -38,29 +37,34 @@ class App extends React.Component{
   }
 
   dateChange = (value) => {
+    var date = value.format('YYYY-MM-DD');
     this.setState({
-        value,
-    });
-    console.log("startDate = "+value.format('YYYY-MM-DD'))
+        startDate:date
+    }); 
+    
   }
+
+ 
 
   timeChange = (value) => {
     this.setState({
-        value,
+        startTime: value.format('HH:mm')
     });
-    console.log("startTime = "+value.format('HH:mm'));
+    
   }
 
   render() {
-    const {title}=this.state;
-    const {content}=this.state;
-    const {dateChange} = this
-    const {timeChange} = this
+    const {title}=this.state.title;
+    const {content}=this.state.content;
+
+    console.log("state.title : ", this.state.title);
+    console.log("state.content : ", this.state.content);
+    console.log("state.startDate : ", this.state.startDate);
+    console.log("state.startTime : ", this.state.startTime);
     
-    
+    // console.log("state :"+this.state)
 
     return (
-  
 
       <div className="App">
         <div className="header">TODO LIST</div>
@@ -90,7 +94,7 @@ class App extends React.Component{
             format="yyyy/MM/DD"
             margin="normal"
             label="시작 예정일"
-            onChange={dateChange}
+            onChange={this.dateChange}
             style={{width:'50%'}}
             KeyboardButtonProps={{
               'aria-label':'change date',
@@ -101,7 +105,7 @@ class App extends React.Component{
           margin="normal"
           label="시작시간"
           variant="inline"
-          onChange={timeChange}
+          onChange={this.timeChange}
           style={{width:'50%'}}
           KeyboardButtonProps={{
             'aria-label':'change time',
