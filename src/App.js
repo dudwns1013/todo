@@ -1,118 +1,120 @@
 import React from 'react';
 //import logo from './logo.svg';
 import './App.css';
+import InputForm from './components/inputform.js';
 // import moment from 'moment';
-import { TextField, Typography } from '@material-ui/core';
-import {KeyboardTimePicker, KeyboardDatePicker} from '@material-ui/pickers';
+import { Typography , List, ListItem, ListItemText } from '@material-ui/core';
+import moment from 'moment';
 
 class App extends React.Component{
+  
   constructor(props){
     super(props);
-    this.state={
+    this.localStorage = window.localStorage;
+    const getItem = localStorage.getItem("todolist_state");
+    if(getItem){
+      this.state = JSON.parse(getItem);
+    }else{
+      this.state={
+        todoList: []
+      }
+    }
+    
+
+
+    // this.timeChange = this.timeChange.bind(this);
+    
+  }
+
+  addTodoList(data){
+    const nowList = this.state.todoList;
+    nowList.push(data);
+    this.setState({
+      todoList:nowList,
+    },()=>{
+      const stringState = JSON.stringify(this.state)
+      localStorage.setItem("todolist_state",stringState);
+    });
+  }
+
+  saveTodoList(){
+    const nowList = this.state.todoList;
+    const {title, content, startDate,startTime,endDate,endTime} = this.state;
+    nowList.push({
+      title, content, startDate,startTime,endDate,endTime
+    });
+    this.setState({
+      todoList: nowList,
       title: "",
       content: "",
       startDate: null,
       startTime: null,
       endDate: null,
       endTime: null
-    }
-
-    // this.timeChange = this.timeChange.bind(this);
-    
+    }, ()=>console.log(this.state))
   }
 
-  titleChange = e => {
-    this.setState({
-        title: e.target.value,
-    });
-    
-  }
-  
+  test(data){
+    console.log("부모 호출",data,this);
 
-  contentChange = e => {
     this.setState({
-        content: e.target.value,
-    });
-    
-  }
-
-  dateChange = (value) => {
-    var date = value.format('YYYY-MM-DD');
-    this.setState({
-        startDate:date
-    }); 
-    
-  }
-
- 
-
-  timeChange = (value) => {
-    this.setState({
-        startTime: value.format('HH:mm')
-    });
-    
+      data
+    })
   }
 
   render() {
-    const {title}=this.state.title;
-    const {content}=this.state.content;
 
-    console.log("state.title : ", this.state.title);
-    console.log("state.content : ", this.state.content);
-    console.log("state.startDate : ", this.state.startDate);
-    console.log("state.startTime : ", this.state.startTime);
+    
+
+    // console.log("state.title : ", this.state.title);
+    // console.log("state.content : ", this.state.content);
+    // console.log("state.startDate : ", this.state.startDate);
+    // console.log("state.startTime : ", this.state.startTime);
     
     // console.log("state :"+this.state)
 
     return (
-
+      
       <div className="App">
-        <div className="header">TODO LIST</div>
-        <paper className="input_area" variant="outlined" style={{padding: '10px'}}>
-          <TextField 
-            label="제목" 
-            placeholder="제목을 입력해 주세요." 
-            name="title"
-            value={title}
-            onChange={this.titleChange}
-            size="normal" 
-            margin="normal" 
-            fullWidth required />
+        <div className="header">AWS 실습</div>
+        <InputForm addTodoList={this.addTodoList.bind(this)}/>
+        <div className="list_area">리스트 영역
+          <List>
+            {this.state.todoList.map((todoItem, idx)=>{
+              let {
+                title, content, startDate, startTime, endDate, endTime
+              } = todoItem;
 
-          <TextField 
-            label="상세내용"
-            name="content"
-            value={content}
-            onChange={this.contentChange} 
-            size="normal" 
-            margin="normal" 
-            fullWidth multiline />
+              if((typeof startDate && typeof startTime && typeof endDate && typeof endTime) === "string"){
+                startDate = moment(startDate);
+                endDate = moment(endDate);
+                startTime = moment(startTime);
+                endTime = moment(endTime);
+              }
+              //console.log(startDate);
+              const checkToday = moment().isBetween(startDate, endDate);
+              const checkF = (moment().diff(startDate)<0);
+              const checkB = (moment().diff(endDate)>0);
 
-          <KeyboardDatePicker
-            disableToolbar
-            variant="inline"
-            format="yyyy/MM/DD"
-            margin="normal"
-            label="시작 예정일"
-            onChange={this.dateChange}
-            style={{width:'50%'}}
-            KeyboardButtonProps={{
-              'aria-label':'change date',
-            }}
-          />
+              let fontColor = "black";
+              if(checkToday) fontColor = "blue";
+              if(checkF) fontColor = "grey";
+              if(checkB) fontColor = "red";
 
-          <KeyboardTimePicker
-          margin="normal"
-          label="시작시간"
-          variant="inline"
-          onChange={this.timeChange}
-          style={{width:'50%'}}
-          KeyboardButtonProps={{
-            'aria-label':'change time',
-          }}
-          />
-        </paper>
-        <div className="list_area">리스트 영역</div>
+              return (
+                <ListItem key={idx} role={undefined} dense button>
+                  <ListItemText primary={"제목 : "+title+ ", 내용 : "+content} 
+                    style={{color:fontColor}}
+                    secondary={moment(startDate).format('YYYY/MM/DD')+', '+startTime.format('HH:mm')+' ~ '+ moment(endDate).format('YYYY/MM/DD')+', '+endTime.format('HH:mm')} 
+                  />
+                </ListItem>
+              )
+            })}
+
+
+          </List>
+
+        </div>
         <Typography variant="body2" color="textSecondary" align="center">
           {'Copyright © 유영준 '+new Date().getFullYear()+'.'}
         </Typography>

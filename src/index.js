@@ -12,7 +12,7 @@ moment.locale('ko');
 
 ReactDOM.render(
   <MuiPickersUtilsProvider utils={MomentUtils}>
-    <App />
+    <App/>
   </MuiPickersUtilsProvider>,
   document.getElementById('root')
 );
